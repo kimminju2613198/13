@@ -9,25 +9,56 @@ struct Book {
 };
 
 int main(void) {
-    struct Book *p;
+    int i;
+    struct Book **bookshelf;
 
-    p = (struct Book *)malloc(2 * sizeof(struct Book));
+    // Allocate memory for 3 Book pointers
+    bookshelf = (struct Book **)malloc(3 * sizeof(struct Book *));
 
-    if (p == NULL) {
+    if (bookshelf == NULL) {
         printf("Memory allocation error\n");
         return 1;
     }
 
-    p->number = 1;
-    strcpy(p->title, "C Programming");
+    // Allocate memory for 10 Book structures for each pointer
+    for (i = 0; i < 3; i++) {
+        bookshelf[i] = (struct Book *)malloc(10 * sizeof(struct Book));
 
-    (p + 1)->number = 2;
-    strcpy((p + 1)->title, "Electronics");
+        if (bookshelf[i] == NULL) {
+            printf("Memory allocation error\n");
 
-    printf("Book 1: %d, %s\n", p->number, p->title);
-    printf("Book 2: %d, %s\n", (p + 1)->number, (p + 1)->title);
+            // Free previously allocated memory
+            while (i > 0) {
+                free(bookshelf[--i]);
+            }
 
-    free(p);
+            free(bookshelf);
+            return 1;
+        }
+    }
+
+    // Store book information
+    bookshelf[1][3].number = 5;
+    strcpy(bookshelf[1][3].title, "C++ Programming");
+
+    (bookshelf[2] + 4)->number = 3;
+    strcpy((bookshelf[2] + 4)->title, "Communications Theory");
+
+    // Print book information
+    printf("Book (1,3): %d, %s\n",
+        (bookshelf[1] + 3)->number,
+        (bookshelf[1] + 3)->title);
+
+    printf("Book (2,4): %d, %s\n",
+        bookshelf[2][4].number,
+        bookshelf[2][4].title);
+
+    // Free allocated memory
+    for (i = 0; i < 3; i++) {
+        free(bookshelf[i]);
+    }
+
+    free(bookshelf);
 
     return 0;
 }
